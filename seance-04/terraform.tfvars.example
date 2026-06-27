@@ -1,0 +1,4 @@
+# terraform.tfvars.example — modèle à copier vers terraform.tfvars
+# ────────────────────────────────────────────────────────────────
+
+minio_root_password = "anfa-password-2026"
