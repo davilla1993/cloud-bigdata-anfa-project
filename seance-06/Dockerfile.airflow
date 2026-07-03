@@ -1,0 +1,14 @@
+# Image Airflow enrichie : JRE (requis par spark-submit) + procps + libs Python.
+# Le driver Spark tourne dans ce conteneur (mode client), d'où le besoin de Java.
+# La version de pyspark doit être IDENTIQUE à celle du cluster (apache/spark:3.5.8),
+# sinon les exécuteurs rejettent les tâches (InvalidClassException à la désérialisation).
+FROM apache/airflow:2.8.1-python3.11
+
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends default-jre-headless procps \
+    && rm -rf /var/lib/apt/lists/*
+ENV JAVA_HOME=/usr/lib/jvm/default-java
+
+USER airflow
+RUN pip install --no-cache-dir boto3 pyspark==3.5.8
