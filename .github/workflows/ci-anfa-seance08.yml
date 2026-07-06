@@ -1,0 +1,72 @@
+# .github/workflows/ci-anfa-seance08.yml
+# ─────────────────────────────────────────────────────────
+# Pipeline CI/CD du TP séance 8 : lint + tests, puis
+# "déploiement" simulé si tout est vert.
+
+name: CI Pipeline Anfa - Séance 8
+
+# ── Déclencheurs ──
+# On se déclenche sur la branche seance-08 (celle de votre rendu),
+# et uniquement si un fichier du dossier seance-08/ a changé.
+on:
+  push:
+    branches: ["seance-08"]
+    paths:
+      - "seance-08/**"
+  pull_request:
+    branches: ["seance-08"]
+    paths:
+      - "seance-08/**"
+
+jobs:
+
+  # ──────────────────────────────────────────────────────
+  # Job 1 : lint + tests unitaires
+  # ──────────────────────────────────────────────────────
+  valider-dag:
+    name: Lint et tests unitaires
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: seance-08     # toutes les commandes s'exécutent ici
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v6
+
+      - name: Installer Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      - name: Vérifier le style (lint)
+        run: flake8 dags/ tests/ --max-line-length=100
+
+      - name: Exécuter les tests unitaires
+        run: pytest tests/ -v
+
+  # ──────────────────────────────────────────────────────
+  # Job 2 : déploiement (simulation), seulement si le job précédent réussit
+  # ──────────────────────────────────────────────────────
+  deployer:
+    name: Deployer le DAG valide (simulation)
+    runs-on: ubuntu-latest
+    needs: valider-dag                          # dépendance : attend le succès du job 1
+    if: github.event_name == 'push'             # pas de déploiement sur une simple PR
+    defaults:
+      run:
+        working-directory: seance-08
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v6
+
+      - name: Simuler le déploiement du DAG validé
+        run: |
+          mkdir -p deploiement_simule/dags
+          cp dags/*.py deploiement_simule/dags/
+          echo "Fichiers déployés :"
+          ls -la deploiement_simule/dags/
