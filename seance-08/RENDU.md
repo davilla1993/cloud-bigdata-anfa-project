@@ -1,8 +1,8 @@
 # Rendu — Séance 8
 
-**Nom et prénom :** <Votre nom complet>
-**Identifiant GitHub :** <votre-username>
-**Date de soumission :** <JJ/MM/AAAA>
+**Nom et prénom :** GBOSSOU Folly Sitou Carlo
+**Identifiant GitHub :** davilla1993
+**Date de soumission :** 06/07/2026
 
 ## Résumé de la séance
 
