@@ -1,0 +1,68 @@
+# docker-compose.yml — Stack de monitoring pour Anfa
+# ────────────────────────────────────────────────────
+
+services:
+
+  # ──────────────────────────────────────────────────────
+  # Prometheus : collecte et stocke les métriques
+  # ──────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v3.13.0
+    container_name: anfa-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"     # UI web de Prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  # ──────────────────────────────────────────────────────
+  # Node Exporter : métriques de la machine hôte
+  # ──────────────────────────────────────────────────────
+  node-exporter:
+    image: prom/node-exporter:v1.11.1
+    container_name: anfa-node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+
+  # ──────────────────────────────────────────────────────
+  # cAdvisor : métriques des conteneurs Docker
+  # ──────────────────────────────────────────────────────
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.52.0
+    container_name: anfa-cadvisor
+    restart: unless-stopped
+    ports:
+      - "8087:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+  # ──────────────────────────────────────────────────────
+  # Notre exportateur métier : fraîcheur des données Anfa
+  # ──────────────────────────────────────────────────────
+  anfa-freshness-exporter:
+    build: ./exporter
+    container_name: anfa-freshness-exporter
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+
+  # ──────────────────────────────────────────────────────
+  # Grafana : visualisation et alertes
+  # ──────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:13.1.0-slim
+    container_name: anfa-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"     # UI web de Grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+
+volumes: {}
