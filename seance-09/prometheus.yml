@@ -1,0 +1,27 @@
+# prometheus.yml — Configuration du scraping
+# ────────────────────────────────────────────
+
+global:
+  scrape_interval: 15s       # Prometheus interroge chaque cible toutes les 15 secondes
+
+scrape_configs:
+
+  # Prometheus se surveille lui-même (bonne pratique systématique)
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Node Exporter : métriques de la machine hôte (CPU, RAM, disque...)
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  # cAdvisor : métriques des conteneurs Docker eux-mêmes
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+  # Notre exportateur métier : fraîcheur des données Anfa
+  - job_name: "anfa-freshness"
+    static_configs:
+      - targets: ["anfa-freshness-exporter:8000"]

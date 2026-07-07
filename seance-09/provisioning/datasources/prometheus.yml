@@ -1,0 +1,13 @@
+# provisioning/datasources/prometheus.yml
+# ─────────────────────────────────────────
+# Déclare automatiquement Prometheus comme source de données Grafana,
+# sans configuration manuelle dans l'interface.
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
