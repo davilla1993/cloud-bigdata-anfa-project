@@ -45,6 +45,13 @@ volumes/
 kubeconfig
 .kube/
 
+# Binaires d'outils CLI téléchargés localement (ex. kind, kubectl, terraform)
+# ne doivent jamais être committés dans le dépôt.
+/**/kind
+/**/kind.exe
+/**/kubectl
+/**/kubectl.exe
+
 .terraform/
 .terraform.lock.hcl
 *.tfstate
