@@ -1,0 +1,32 @@
+# docker-compose.yml — Serveur MLflow Tracking (configuration simplifiée TP)
+# ───────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ──────────────────────────────────────────────────────
+  # MLflow Tracking Server
+  # ──────────────────────────────────────────────────────
+  mlflow:
+    image: python:3.11-slim
+    container_name: anfa-mlflow
+    restart: unless-stopped
+    working_dir: /mlflow
+    ports:
+      - "5000:5000"       # UI et API MLflow
+    volumes:
+      # Volume persistant : la base SQLite et les artefacts survivent
+      # à un redémarrage du conteneur.
+      - mlflow-data:/mlflow
+    command: >
+      bash -c "
+      pip install mlflow==2.11.3 &&
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --serve-artifacts
+      --artifacts-destination /mlflow/artifacts
+      "
+
+volumes:
+  mlflow-data:
